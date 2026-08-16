@@ -1,0 +1,1528 @@
+// ================================================================
+//  ОСНОВНАЯ ЛОГИКА: КОНФИГУРАЦИЯ, ПЕРЕВОДЫ, УТИЛИТЫ, ХРАНИЛИЩЕ,
+//  ТРЕНИРОВКИ, ДОСТИЖЕНИЯ, ГРАФИКИ, АДМИН-ПАНЕЛЬ
+// ================================================================
+
+// ================================================================
+//  КОНФИГУРАЦИЯ
+// ================================================================
+const CONFIG = {
+    ADMIN_PASSWORD: 'FitMaster2024!',
+    REWARD_BASE: 10,
+    CHALLENGE_BONUS: 10,
+    BOSS_WIN: 10,
+    BOSS_LOSE: 2,
+    RANKS: [
+        { key: 'novice', name: 'Новичок', min: 0 },
+        { key: 'fighter', name: 'Боец', min: 50 },
+        { key: 'veteran', name: 'Ветеран', min: 150 },
+        { key: 'hero', name: 'Герой', min: 300 },
+        { key: 'legend', name: 'Легенда', min: 600 }
+    ],
+    // ===== ПРЕДМЕТЫ (все товары) =====
+    ITEMS: [
+        // Аватарки
+        { id: 'lion', name: 'Лев', icon: '🦁', price: 30, type: 'avatar' },
+        { id: 'dragon', name: 'Дракон', icon: '🐉', price: 50, type: 'avatar' },
+        { id: 'rocket', name: 'Космос', icon: '🚀', price: 40, type: 'avatar' },
+        { id: 'star', name: 'Звезда', icon: '🌟', price: 25, type: 'avatar' },
+        { id: 'fox', name: 'Лиса', icon: '🦊', price: 20, type: 'avatar' },
+        { id: 'wolf', name: 'Волк', icon: '🐺', price: 35, type: 'avatar' },
+        { id: 'eagle', name: 'Орёл', icon: '🦅', price: 45, type: 'avatar' },
+        { id: 'fire', name: 'Огонь', icon: '🔥', price: 60, type: 'avatar' },
+        { id: 'alien', name: 'Инопланетянин', icon: '👾', price: 55, type: 'avatar' },
+        { id: 'gamer', name: 'Геймер', icon: '🎮', price: 30, type: 'avatar' },
+        { id: 'ninja', name: 'Ниндзя', icon: '🥷', price: 50, type: 'avatar' },
+        { id: 'wizard', name: 'Волшебник', icon: '🧙', price: 55, type: 'avatar' },
+        // Рамки
+        { id: 'frame_red', name: 'Красная рамка', icon: '🟥', price: 10, type: 'frame' },
+        { id: 'frame_green', name: 'Зелёная рамка', icon: '🟩', price: 10, type: 'frame' },
+        { id: 'frame_blue', name: 'Синяя рамка', icon: '🟦', price: 10, type: 'frame' },
+        { id: 'frame_yellow', name: 'Жёлтая рамка', icon: '🟨', price: 10, type: 'frame' },
+        { id: 'frame_purple', name: 'Фиолетовая рамка', icon: '🟪', price: 15, type: 'frame' },
+        { id: 'frame_pink', name: 'Розовая рамка', icon: '🩰', price: 15, type: 'frame' },
+        { id: 'frame_gold', name: 'Золотая рамка', icon: '🏆', price: 30, type: 'frame' },
+        { id: 'frame_silver', name: 'Серебряная рамка', icon: '⚪', price: 25, type: 'frame' },
+        { id: 'frame_rainbow', name: 'Радужная рамка', icon: '🌈', price: 50, type: 'frame' },
+        { id: 'frame_neon', name: 'Неоновая рамка', icon: '💡', price: 40, type: 'frame' },
+        { id: 'frame_diamond', name: 'Алмазная рамка', icon: '💎', price: 100, type: 'frame' },
+        { id: 'frame_glow', name: 'Светящаяся рамка', icon: '✨', price: 45, type: 'frame' },
+        // Баннеры
+        { id: 'banner_red', name: 'Красный баннер', icon: '🔴', price: 15, type: 'banner' },
+        { id: 'banner_blue', name: 'Синий баннер', icon: '🔵', price: 15, type: 'banner' },
+        { id: 'banner_green', name: 'Зелёный баннер', icon: '🟢', price: 15, type: 'banner' },
+        { id: 'banner_yellow', name: 'Жёлтый баннер', icon: '🟡', price: 15, type: 'banner' },
+        { id: 'banner_purple', name: 'Фиолетовый баннер', icon: '🟣', price: 20, type: 'banner' },
+        { id: 'banner_pink', name: 'Розовый баннер', icon: '🩷', price: 20, type: 'banner' },
+        { id: 'banner_sunset', name: 'Закат', icon: '🌅', price: 35, type: 'banner' },
+        { id: 'banner_space', name: 'Космос', icon: '🌌', price: 45, type: 'banner' },
+        { id: 'banner_ocean', name: 'Океан', icon: '🌊', price: 35, type: 'banner' },
+        { id: 'banner_fire', name: 'Огонь', icon: '🔥', price: 40, type: 'banner' },
+        { id: 'banner_rainbow', name: 'Радуга', icon: '🌈', price: 60, type: 'banner' },
+        { id: 'banner_gold', name: 'Золотой', icon: '⭐', price: 50, type: 'banner' },
+        { id: 'banner_neon', name: 'Неоновый', icon: '💫', price: 45, type: 'banner' },
+        // Титулы
+        { id: 'title_bronze', name: 'Бронзовый', icon: '🥉', price: 20, type: 'title' },
+        { id: 'title_silver', name: 'Серебряный', icon: '🥈', price: 30, type: 'title' },
+        { id: 'title_gold', name: 'Золотой', icon: '🥇', price: 50, type: 'title' },
+        { id: 'title_diamond', name: 'Алмазный', icon: '💎', price: 80, type: 'title' },
+        { id: 'title_rainbow', name: 'Радужный', icon: '🌈', price: 70, type: 'title' },
+        { id: 'title_purple', name: 'Фиолетовый', icon: '🟣', price: 40, type: 'title' },
+        { id: 'title_neon', name: 'Неоновый', icon: '🟢', price: 45, type: 'title' },
+        { id: 'title_legend', name: 'Легенда', icon: '👑', price: 150, type: 'title' },
+        { id: 'title_master', name: 'Мастер', icon: '⚡', price: 100, type: 'title' },
+        { id: 'title_champion', name: 'Чемпион', icon: '🏆', price: 120, type: 'title' },
+        { id: 'title_star', name: 'Звёздный', icon: '🌟', price: 90, type: 'title' },
+        { id: 'title_flame', name: 'Пламенный', icon: '🔥', price: 110, type: 'title' },
+        { id: 'title_ghost', name: 'Призрачный', icon: '👻', price: 80, type: 'title' },
+        { id: 'title_shadow', name: 'Теневой', icon: '🌑', price: 85, type: 'title' },
+    ],
+    // ===== ДОПОЛНИТЕЛЬНЫЕ ПРЕДМЕТЫ (старые, можно объединить) =====
+    SHOP: [
+        { id: 'frame1', name: '🖼️ Серая рамка', price: 20 },
+        { id: 'frame2', name: '🖼️ Золотая рамка', price: 50 },
+        { id: 'skin1', name: '🎨 Скин "Космос"', price: 100 },
+        { id: 'title1', name: '🏅 Титул "Новичок"', price: 30 }
+    ],
+    LOOT: [
+        { name: 'Скин "Тигр"', rarity: 'legendary', emoji: '🐯' },
+        { name: 'Скин "Дракон"', rarity: 'legendary', emoji: '🐉' },
+        { name: 'Фраза "Ты машина!"', rarity: 'common', emoji: '💪' },
+        { name: 'Скин "Космос"', rarity: 'rare', emoji: '🚀' }
+    ],
+    CHALLENGES: [
+        { task: '50 приседаний за 1 минуту', bonus: 10 },
+        { task: '3 подхода планки по 1 минуте', bonus: 15 },
+        { task: '20 отжиманий с хлопком', bonus: 12 }
+    ],
+    BOSS_NAMES: ['Мистер Сталь', 'Железный Дракон', 'Король Льдов', 'Теневой Властелин'],
+    ACHIEVEMENTS: [
+        // ... (как в прошлом ответе, но с типами)
+        { id: 'first', name: 'Первая тренировка', target: 1, icon: '🏋️', type: 'workout' },
+        { id: '10_w', name: '10 тренировок', target: 10, icon: '💪', type: 'workout' },
+        { id: '100_w', name: '100 тренировок', target: 100, icon: '🔥', type: 'workout' },
+        { id: '5_boss', name: '5 побед над боссами', target: 5, icon: '⚔️', type: 'boss' },
+        { id: '1000_pts', name: '1000 очков', target: 1000, icon: '🌟', type: 'points' },
+        { id: '7_streak', name: 'Серия 7 дней', target: 7, icon: '🔥', type: 'streak' },
+        { id: '30_streak', name: 'Серия 30 дней', target: 30, icon: '👑', type: 'streak' },
+        { id: 'collector_5', name: 'Коллекционер', target: 5, icon: '📦', type: 'collection' },
+        { id: 'collector_10', name: 'Стиляга', target: 10, icon: '🕶️', type: 'collection' },
+        { id: 'collector_20', name: 'Икона стиля', target: 20, icon: '👗', type: 'collection' },
+        { id: 'avatar_master', name: 'Аватар-мастер', target: 3, icon: '🧑‍🎨', type: 'avatars' },
+        { id: 'frame_master', name: 'Рамщик', target: 5, icon: '🖼️', type: 'frames' },
+        { id: 'banner_king', name: 'Баннерный король', target: 5, icon: '👑', type: 'banners' },
+        { id: 'title_master', name: 'Титулованный', target: 5, icon: '🏅', type: 'titles' },
+        { id: 'all_titles', name: 'Легендарный коллекционер', target: 14, icon: '🌟', type: 'all_titles' }
+    ],
+    EXERCISES: {
+        'Фитнес': {
+            beginner: [{name:'отжимания от стены',count:15,min:30,max:60}],
+            medium: [{name:'классические отжимания',count:20,min:45,max:90}],
+            advanced: [{name:'отжимания с хлопком',count:15,min:40,max:80}],
+            pro: [{name:'отжимания на одной руке',count:10,min:50,max:100}],
+            elite: [{name:'отжимания в стойке',count:8,min:60,max:110}]
+        },
+        'Качек': {
+            beginner: [{name:'отжимания от стены',count:15,min:30,max:60}],
+            medium: [{name:'классические отжимания',count:25,min:50,max:100}],
+            advanced: [{name:'отжимания с весом',count:20,min:55,max:105}],
+            pro: [{name:'отжимания на брусьях',count:15,min:60,max:110}],
+            elite: [{name:'отжимания в стойке',count:10,min:70,max:120}]
+        },
+        'Йога': {
+            beginner: [{name:'планка на коленях',count:1,min:40,max:80}],
+            medium: [{name:'планка',count:1,min:60,max:120}],
+            advanced: [{name:'планка на одной руке',count:1,min:80,max:150}],
+            pro: [{name:'планка с подъемом ноги',count:1,min:100,max:180}],
+            elite: [{name:'планка с отягощением',count:1,min:140,max:220}]
+        },
+        'Силовой': {
+            beginner: [{name:'отжимания от стены',count:15,min:30,max:60}],
+            medium: [{name:'классические отжимания',count:25,min:50,max:100}],
+            advanced: [{name:'отжимания с хлопком',count:15,min:50,max:90}],
+            pro: [{name:'отжимания на одной руке',count:10,min:60,max:110}],
+            elite: [{name:'отжимания в стойке',count:8,min:70,max:120}]
+        }
+    }
+};
+
+// ================================================================
+//  ПЕРЕВОДЫ (полные)
+// ================================================================
+const LANG = {
+    ru: {
+        app_title: 'Фитнес-игра',
+        login_sub: 'Войди в аккаунт', login_username: 'Никнейм', login_password: 'Пароль',
+        login_btn: 'Войти', login_register_link_btn: 'Регистрация',
+        register_title: 'Регистрация', register_sub: 'Создай аккаунт',
+        register_username: 'Никнейм', register_password: 'Пароль',
+        register_confirm_password: 'Подтверди пароль', register_ref_code: 'Реферальный код',
+        register_btn: 'Зарегистрироваться', register_login_link_btn: 'Войти',
+        register_error_username_empty: 'Введи никнейм!',
+        register_error_username_exists: 'Никнейм занят!',
+        register_error_password_short: 'Пароль минимум 6 символов!',
+        register_error_password_mismatch: 'Пароли не совпадают!',
+        auth_success_login: 'Добро пожаловать!', auth_success_reg: 'Аккаунт создан!',
+        logout_btn: 'Выйти',
+        tab_train: 'Трен', tab_shop: 'Маг', tab_leader: 'Лидеры',
+        tab_chart: 'Граф', tab_fight: 'Босс', tab_achievements: 'Дост',
+        tab_settings: 'Наст', tab_inventory: 'Инв',
+        inventory_title: 'Инвентарь',
+        task_name: 'отжиманий', task_desc: 'Выполни и нажми "Готово"',
+        start_btn: 'Начать', finish_btn: 'Готово',
+        norm_info: 'Норматив: ',
+        shop_title: 'Магазин', buy_btn: 'Купить',
+        leader_title: 'Лидерборд', chart_title: 'Прогресс',
+        settings_title: 'Настройки', settings_theme: 'Тёмная тема',
+        settings_sound: 'Звук', settings_lang: 'Язык',
+        settings_goal_title: 'Цель',
+        settings_export_data: 'Экспорт данных', settings_import_data: 'Импорт данных',
+        settings_export_csv: 'CSV экспорт',
+        settings_reset: 'Сбросить прогресс', reset_warning: 'Удалит все данные безвозвратно',
+        fight_title: 'Битва с боссом', fight_btn: 'Сразиться',
+        boss_power: 'Сила: {power}',
+        fight_win: 'Победа! +{reward} очков!', fight_lose: 'Поражение... +{reward} очков.',
+        fight_already: 'Ты уже сражался сегодня!',
+        rank_novice: 'Новичок', rank_fighter: 'Боец',
+        rank_veteran: 'Ветеран', rank_hero: 'Герой',
+        rank_legend: 'Легенда',
+        rank_progress: 'До следующего ранга: {points} очков',
+        challenge_today: 'Челлендж: {task}',
+        challenge_done: 'Челлендж выполнен! +{bonus} очков!',
+        loot_title: 'Тебе выпало:', loot_close: 'Круто!',
+        loot_common: 'Обычный', loot_rare: 'Редкий', loot_legendary: 'Легендарный',
+        alert_no_user: 'Войди в аккаунт', alert_no_points: 'Не хватает очков!',
+        alert_purchase_success: 'Покупка успешна!',
+        alert_logout: 'Выйти из аккаунта?',
+        alert_reset_confirm: 'Сбросить прогресс навсегда? Введите слово "СБРОС"',
+        alert_reset_done: 'Прогресс сброшен!',
+        result_too_fast: 'Слишком быстро! ({elapsed} сек). Норматив: {min}–{max} сек.',
+        result_too_slow: 'Слишком медленно ({elapsed} сек). Норматив: {min}–{max} сек.',
+        result_success: 'Молодец! Время: {elapsed} сек. +{reward} очков. Серия: {streak} дней. Ранг: {rank}',
+        result_already_done: 'Ты уже выполнил сегодня!',
+        no_data: 'Нет данных', points_short: 'оч.',
+        share_text: 'Я сделал {task} за {time} и получил {points} очков! Присоединяйся!',
+        share_btn: 'Поделиться',
+        admin_title: 'Админ-панель',
+        admin_tab_staff: 'Сотрудники', admin_tab_shop: 'Магазин',
+        admin_tab_promo: 'Промокоды', admin_tab_analytics: 'Аналитика',
+        admin_no_access: 'Нет доступа',
+        promo_activate: 'Активировать', promo_ph: 'Введите код',
+        promo_title: 'Промокод',
+        bought: 'Куплено',
+        achievements_title: 'Достижения',
+        custom_exercises: 'Мои упражнения',
+        custom_ex_name: 'Название', custom_ex_count: 'Кол-во',
+        '1rm_title': '1ПМ (одноповторный максимум)',
+        '1rm_weight_ph': 'Вес (кг)', '1rm_reps_ph': 'Повторы',
+        '1rm_calc_btn': '1RM',
+        result_1rm: '1ПМ: {rm} кг', result_1rm_error: 'Введи вес и повторения',
+        avatar_picker_title: 'Выберите аватар',
+        profile_stats_points: 'Очки', profile_stats_rank: 'Ранг',
+        profile_stats_workouts: 'Тренировок', profile_stats_streak: 'Серия',
+        profile_stats_age: 'Возраст', profile_stats_weight: 'Вес',
+        profile_stats_gender: 'Пол', profile_stats_path: 'Путь',
+        profile_stats_goal: 'Цель', profile_stats_level: 'Уровень',
+        profile_stats_boss: 'Побед над боссами', profile_stats_inventory: 'Предметов',
+        change_avatar_btn: 'Сменить аватар',
+        use_btn: 'Использовать',
+        active_label: 'Активно',
+        owned_label: 'Куплено',
+        not_owned_label: 'Купить',
+        type_avatar: 'Аватар', type_frame: 'Рамка', type_banner: 'Баннер', type_title: 'Титул'
+    },
+    en: {
+        // ... (все английские ключи, полный набор)
+        app_title: 'Fitness Game',
+        login_sub: 'Sign in', login_username: 'Username', login_password: 'Password',
+        login_btn: 'Login', login_register_link_btn: 'Register',
+        register_title: 'Register', register_sub: 'Create account',
+        register_username: 'Username', register_password: 'Password',
+        register_confirm_password: 'Confirm password', register_ref_code: 'Referral code',
+        register_btn: 'Register', register_login_link_btn: 'Login',
+        register_error_username_empty: 'Enter username!',
+        register_error_username_exists: 'Username taken!',
+        register_error_password_short: 'Password min 6 chars!',
+        register_error_password_mismatch: 'Passwords do not match!',
+        auth_success_login: 'Welcome!', auth_success_reg: 'Account created!',
+        logout_btn: 'Logout',
+        tab_train: 'Train', tab_shop: 'Shop', tab_leader: 'Leaders',
+        tab_chart: 'Chart', tab_fight: 'Boss', tab_achievements: 'Achieve',
+        tab_settings: 'Settings', tab_inventory: 'Inv',
+        inventory_title: 'Inventory',
+        task_name: 'push-ups', task_desc: 'Complete and press "Done"',
+        start_btn: 'Start', finish_btn: 'Done',
+        norm_info: 'Norm: ',
+        shop_title: 'Shop', buy_btn: 'Buy',
+        leader_title: 'Leaderboard', chart_title: 'Progress',
+        settings_title: 'Settings', settings_theme: 'Dark theme',
+        settings_sound: 'Sound', settings_lang: 'Language',
+        settings_goal_title: 'Goal',
+        settings_export_data: 'Export data', settings_import_data: 'Import data',
+        settings_export_csv: 'CSV export',
+        settings_reset: 'Reset progress', reset_warning: 'Deletes all data permanently',
+        fight_title: 'Boss battle', fight_btn: 'Fight',
+        boss_power: 'Power: {power}',
+        fight_win: 'Victory! +{reward} points!', fight_lose: 'Defeat... +{reward} points.',
+        fight_already: 'You already fought today!',
+        rank_novice: 'Novice', rank_fighter: 'Fighter',
+        rank_veteran: 'Veteran', rank_hero: 'Hero',
+        rank_legend: 'Legend',
+        rank_progress: 'Next rank: {points} points',
+        challenge_today: 'Challenge: {task}',
+        challenge_done: 'Challenge completed! +{bonus} points!',
+        loot_title: 'You got:', loot_close: 'Cool!',
+        loot_common: 'Common', loot_rare: 'Rare', loot_legendary: 'Legendary',
+        alert_no_user: 'Login required', alert_no_points: 'Not enough points!',
+        alert_purchase_success: 'Purchase successful!',
+        alert_logout: 'Logout?',
+        alert_reset_confirm: 'Reset progress forever? Type "RESET"',
+        alert_reset_done: 'Progress reset!',
+        result_too_fast: 'Too fast! ({elapsed} sec). Norm: {min}–{max} sec.',
+        result_too_slow: 'Too slow ({elapsed} sec). Norm: {min}–{max} sec.',
+        result_success: 'Well done! Time: {elapsed} sec. +{reward} pts. Streak: {streak} days. Rank: {rank}',
+        result_already_done: 'Already done today!',
+        no_data: 'No data', points_short: 'pts.',
+        share_text: 'I did {task} in {time} and got {points} points! Join now!',
+        share_btn: 'Share',
+        admin_title: 'Admin panel',
+        admin_tab_staff: 'Staff', admin_tab_shop: 'Shop',
+        admin_tab_promo: 'Promocodes', admin_tab_analytics: 'Analytics',
+        admin_no_access: 'Access denied',
+        promo_activate: 'Activate', promo_ph: 'Enter code',
+        promo_title: 'Promocode',
+        bought: 'Bought',
+        achievements_title: 'Achievements',
+        custom_exercises: 'My exercises',
+        custom_ex_name: 'Name', custom_ex_count: 'Count',
+        '1rm_title': '1RM (one rep max)',
+        '1rm_weight_ph': 'Weight (kg)', '1rm_reps_ph': 'Reps',
+        '1rm_calc_btn': '1RM',
+        result_1rm: '1RM: {rm} kg', result_1rm_error: 'Enter weight and reps',
+        avatar_picker_title: 'Choose avatar',
+        profile_stats_points: 'Points', profile_stats_rank: 'Rank',
+        profile_stats_workouts: 'Workouts', profile_stats_streak: 'Streak',
+        profile_stats_age: 'Age', profile_stats_weight: 'Weight',
+        profile_stats_gender: 'Gender', profile_stats_path: 'Path',
+        profile_stats_goal: 'Goal', profile_stats_level: 'Level',
+        profile_stats_boss: 'Boss wins', profile_stats_inventory: 'Items',
+        change_avatar_btn: 'Change avatar',
+        use_btn: 'Use', active_label: 'Active', owned_label: 'Owned', not_owned_label: 'Buy',
+        type_avatar: 'Avatar', type_frame: 'Frame', type_banner: 'Banner', type_title: 'Title'
+    }
+};
+
+// ================================================================
+//  ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
+// ================================================================
+let currentLang = localStorage.getItem('lang') || 'ru';
+let currentUser = null;
+let timerInterval = null;
+let seconds = 0;
+let isRunning = false;
+let minTime = 45, maxTime = 90;
+let currentTask = null;
+let isFinished = false;
+let chartInstance = null;
+let workoutChartInstance = null;
+let adminUnlocked = false;
+let shopItems = [];
+
+// ================================================================
+//  ФУНКЦИИ ПЕРЕВОДА
+// ================================================================
+function t(key, vars) {
+    let str = LANG[currentLang]?.[key] || LANG['ru'][key] || key;
+    if (vars) for (let k in vars) str = str.replace(new RegExp('{' + k + '}', 'g'), vars[k]);
+    return str;
+}
+
+function updateUI() {
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (key) el.textContent = t(key);
+    });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        if (key) el.placeholder = t(key);
+    });
+    document.title = t('app_title');
+    const normInfoSpan = document.querySelector('#normInfo [data-i18n="norm_info"]');
+    if (normInfoSpan) normInfoSpan.textContent = t('norm_info');
+    if (currentUser) {
+        loadShop();
+        loadInventory();
+        loadLeaderboard();
+        loadBoss();
+        loadChallenge();
+        updateRankDisplay();
+        loadAchievements();
+        loadCustomExercises();
+        loadChart();
+        toggleAdminPanel();
+        updateHeaderAvatar();
+    }
+}
+
+function setLanguage(lang) {
+    if (LANG[lang]) {
+        currentLang = lang;
+        localStorage.setItem('lang', lang);
+        document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
+        document.getElementById('langSelect').value = lang;
+        updateUI();
+    }
+}
+
+// ================================================================
+//  УТИЛИТЫ
+// ================================================================
+function showToast(msg, type = 'info') {
+    const container = document.querySelector('.toast-container') || (() => {
+        const c = document.createElement('div');
+        c.className = 'toast-container';
+        document.body.appendChild(c);
+        return c;
+    })();
+    const toast = document.createElement('div');
+    toast.className = 'toast' + (type === 'success' ? ' toast-success' : type === 'error' ? ' toast-error' : '');
+    toast.textContent = msg;
+    container.appendChild(toast);
+    setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 2500);
+}
+
+function playSound(type) {
+    if (!document.getElementById('soundToggle').checked) return;
+    try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        gain.gain.value = 0.12;
+        let freq = 600, dur = 0.2;
+        if (type === 'start') { freq = 800; dur = 0.1; }
+        else if (type === 'finish') { freq = 1000; dur = 0.3; }
+        else if (type === 'error') { freq = 300; dur = 0.4; }
+        else if (type === 'loot') { freq = 1200; dur = 0.15; gain.gain.value = 0.08; }
+        else if (type === 'boss') { freq = 150; dur = 0.6; }
+        else if (type === 'buy') { freq = 500; dur = 0.15; gain.gain.value = 0.1; }
+        osc.frequency.value = freq;
+        osc.type = type === 'boss' ? 'sawtooth' : 'square';
+        osc.start();
+        setTimeout(() => osc.stop(), dur * 1000);
+    } catch(e) {}
+}
+
+function fireConfetti() {
+    if (typeof confetti !== 'undefined') {
+        confetti({ particleCount: 80, spread: 60, origin: { y: 0.6 } });
+    }
+}
+
+function closeLootModal() {
+    document.getElementById('lootModal').style.display = 'none';
+}
+
+// ================================================================
+//  ХРАНИЛИЩЕ
+// ================================================================
+function getUsers() {
+    return JSON.parse(localStorage.getItem('users') || '{}');
+}
+
+function saveUsers(users) {
+    localStorage.setItem('users', JSON.stringify(users));
+}
+
+function hashPassword(pw) {
+    return btoa(pw);
+}
+
+function loadShopItems() {
+    const stored = localStorage.getItem('shopItems_v2');
+    if (stored) {
+        shopItems = JSON.parse(stored);
+    } else {
+        shopItems = [...CONFIG.ITEMS];
+        saveShopItems();
+    }
+}
+
+function saveShopItems() {
+    localStorage.setItem('shopItems_v2', JSON.stringify(shopItems));
+}
+
+// ================================================================
+//  ФУНКЦИИ ДЛЯ ПРЕДМЕТОВ И ИНВЕНТАРЯ
+// ================================================================
+function findItemById(id) {
+    return shopItems.find(i => i.id === id) || null;
+}
+
+function getUserInventory(user) {
+    return user.inventory || [];
+}
+
+function isItemOwned(user, itemId) {
+    return (user.inventory || []).some(i => i.id === itemId);
+}
+
+function addItemToInventory(user, itemId) {
+    const item = findItemById(itemId);
+    if (!item) return false;
+    if (isItemOwned(user, itemId)) return false;
+    if (!user.inventory) user.inventory = [];
+    user.inventory.push({...item});
+    return true;
+}
+
+function setActiveItem(user, type, itemId) {
+    const item = findItemById(itemId);
+    if (!item || item.type !== type) return;
+    if (!isItemOwned(user, itemId)) return;
+    switch(type) {
+        case 'avatar': user.avatar = itemId; break;
+        case 'frame': user.frame = itemId; break;
+        case 'banner': user.banner = itemId; break;
+        case 'title': user.title = itemId; break;
+        default: return;
+    }
+}
+
+// ================================================================
+//  ЭКРАНЫ
+// ================================================================
+function showLoginScreen() {
+    document.getElementById('loginScreen').style.display = 'block';
+    document.getElementById('registerScreen').style.display = 'none';
+    document.getElementById('mainScreen').style.display = 'none';
+}
+
+function showRegisterScreen() {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('registerScreen').style.display = 'block';
+}
+
+function showMainScreen() {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('registerScreen').style.display = 'none';
+    document.getElementById('mainScreen').style.display = 'block';
+    document.getElementById('userNameDisplay').textContent = currentUser.nickname;
+    document.getElementById('avatarDisplay').textContent = currentUser.nickname.charAt(0).toUpperCase();
+    document.getElementById('userPointsDisplay').textContent = currentUser.points || 0;
+    document.getElementById('headerNick').textContent = currentUser.nickname;
+    document.getElementById('headerPoints').textContent = '🪙 ' + (currentUser.points || 0);
+    if (currentUser.role && currentUser.role !== 'user') {
+        document.getElementById('roleDisplay').style.display = 'block';
+        document.getElementById('roleDisplay').textContent = currentUser.role.toUpperCase();
+    } else {
+        document.getElementById('roleDisplay').style.display = 'none';
+    }
+    loadShopItems();
+    initTrainScreen();
+    loadShop();
+    loadInventory();
+    loadLeaderboard();
+    loadBoss();
+    loadChallenge();
+    updateRankDisplay();
+    loadAchievements();
+    loadCustomExercises();
+    loadChart();
+    checkDailyBonus();
+    toggleAdminPanel();
+    updateUI();
+}
+
+// ================================================================
+//  ТРЕНИРОВКИ
+// ================================================================
+function formatTime(sec) {
+    const m = String(Math.floor(sec / 60)).padStart(2, '0');
+    const s = String(sec % 60).padStart(2, '0');
+    return m + ':' + s;
+}
+
+function calculateFactor(user) {
+    try {
+        let f = 1.0;
+        if (user.weight > 90) f += 0.3;
+        else if (user.weight > 75) f += 0.15;
+        else if (user.weight < 60) f -= 0.1;
+        if (user.gender === 'female') f += 0.2;
+        if (user.age > 50) f += 0.3;
+        else if (user.age > 40) f += 0.15;
+        if (user.fitnessLevel === 'beginner') f += 0.3;
+        else if (user.fitnessLevel === 'advanced') f -= 0.2;
+        else if (user.fitnessLevel === 'pro') f -= 0.35;
+        else if (user.fitnessLevel === 'elite') f -= 0.5;
+        return Math.max(0.4, Math.min(2.0, f));
+    } catch(e) { return 1.0; }
+}
+
+function generateTask() {
+    try {
+        if (!currentUser) return { name: 'отжимания', count: 20, min: 45, max: 90 };
+        const path = currentUser.path || 'Фитнес';
+        const level = currentUser.fitnessLevel || 'medium';
+        const pool = CONFIG.EXERCISES[path]?.[level] || CONFIG.EXERCISES['Фитнес']['medium'];
+        const custom = currentUser.customExercises || [];
+        const all = [...pool, ...custom];
+        if (!all || all.length === 0) return { name: 'отжимания', count: 20, min: 45, max: 90 };
+        const task = all[Math.floor(Math.random() * all.length)];
+        if (!task.min) task.min = 30;
+        if (!task.max) task.max = 90;
+        return task;
+    } catch(e) {
+        return { name: 'отжимания', count: 20, min: 45, max: 90 };
+    }
+}
+
+function initTrainScreen() {
+    if (!currentUser) return;
+    const task = generateTask();
+    currentTask = task;
+    document.getElementById('taskName').textContent = task.count + ' ' + task.name;
+    const factor = calculateFactor(currentUser);
+    minTime = Math.round(task.min * factor);
+    maxTime = Math.round(task.max * factor);
+    document.getElementById('normMin').textContent = formatTime(minTime);
+    document.getElementById('normMax').textContent = formatTime(maxTime);
+    document.getElementById('userPointsDisplay').textContent = currentUser.points || 0;
+    document.getElementById('startBtn').style.display = 'inline-block';
+    document.getElementById('finishBtn').classList.add('hidden');
+    document.getElementById('timerDisplay').textContent = '00:00';
+    document.getElementById('result').textContent = '';
+    document.getElementById('shareContainer').style.display = 'none';
+    if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+    isRunning = false; isFinished = false; seconds = 0;
+    if (currentUser.dailyDone) {
+        document.getElementById('result').textContent = t('result_already_done');
+        document.getElementById('startBtn').style.display = 'none';
+        document.getElementById('finishBtn').classList.add('hidden');
+    }
+    loadChallenge();
+    updateRankDisplay();
+}
+
+document.getElementById('startBtn').addEventListener('click', function() {
+    if (isRunning) return;
+    if (!currentUser || currentUser.dailyDone) {
+        document.getElementById('result').textContent = t('result_already_done');
+        return;
+    }
+    if (timerInterval) clearInterval(timerInterval);
+    seconds = 0;
+    document.getElementById('timerDisplay').textContent = '00:00';
+    isRunning = true;
+    isFinished = false;
+    this.style.display = 'none';
+    document.getElementById('finishBtn').classList.remove('hidden');
+    document.getElementById('result').textContent = '⏳ Выполняй...';
+    currentTask = generateTask();
+    document.getElementById('taskName').textContent = currentTask.count + ' ' + currentTask.name;
+    const factor = calculateFactor(currentUser);
+    minTime = Math.round(currentTask.min * factor);
+    maxTime = Math.round(currentTask.max * factor);
+    document.getElementById('normMin').textContent = formatTime(minTime);
+    document.getElementById('normMax').textContent = formatTime(maxTime);
+    timerInterval = setInterval(() => {
+        seconds++;
+        document.getElementById('timerDisplay').textContent = formatTime(seconds);
+    }, 1000);
+    playSound('start');
+});
+
+document.getElementById('finishBtn').addEventListener('click', function() {
+    if (!isRunning || isFinished) return;
+    clearInterval(timerInterval);
+    timerInterval = null;
+    isRunning = false;
+    isFinished = true;
+    this.classList.add('hidden');
+    document.getElementById('startBtn').style.display = 'inline-block';
+    const elapsed = seconds;
+    const result = document.getElementById('result');
+    if (elapsed < 2) {
+        result.textContent = '⏳ Подожди хотя бы 2 секунды!';
+        result.style.color = '#f39c12';
+        document.getElementById('startBtn').style.display = 'inline-block';
+        document.getElementById('finishBtn').classList.add('hidden');
+        isRunning = false; isFinished = false;
+        return;
+    }
+    if (elapsed < minTime * 0.7) {
+        result.textContent = t('result_too_fast', { elapsed, min: minTime, max: maxTime });
+        result.style.color = '#e74c3c';
+        playSound('error');
+        document.getElementById('startBtn').style.display = 'inline-block';
+        return;
+    }
+    if (elapsed > maxTime * 1.5) {
+        result.textContent = t('result_too_slow', { elapsed, min: minTime, max: maxTime });
+        result.style.color = '#f39c12';
+        playSound('error');
+        document.getElementById('startBtn').style.display = 'inline-block';
+        return;
+    }
+    const reward = CONFIG.REWARD_BASE + (currentUser.fitnessLevel === 'elite' ? 5 : 0);
+    let challengeBonus = 0;
+    const challenge = getDailyChallenge();
+    if (challenge && !currentUser.dailyChallengeDone) {
+        challengeBonus = CONFIG.CHALLENGE_BONUS;
+        currentUser.dailyChallengeDone = true;
+        showToast(t('challenge_done', { bonus: challengeBonus }), 'success');
+    }
+    const totalReward = reward + challengeBonus;
+    currentUser.points += totalReward;
+    currentUser.dailyDone = true;
+    currentUser.streak = (currentUser.streak || 0) + 1;
+    currentUser.totalWorkouts = (currentUser.totalWorkouts || 0) + 1;
+    const historyKey = 'history_' + currentUser.nickname;
+    let history = JSON.parse(localStorage.getItem(historyKey) || '[]');
+    history.push({ date: new Date().toISOString().slice(0,10), points: currentUser.points, workout: currentTask.name, time: elapsed });
+    if (history.length > 30) history = history.slice(-30);
+    localStorage.setItem(historyKey, JSON.stringify(history));
+    updateAchievements();
+    const users = getUsers();
+    users[currentUser.nickname] = currentUser;
+    saveUsers(users);
+    localStorage.setItem('currentUser', currentUser.nickname);
+    document.getElementById('userPointsDisplay').textContent = currentUser.points;
+    document.getElementById('headerPoints').textContent = '🪙 ' + currentUser.points;
+    updateRankDisplay();
+    const oldRank = getRank(currentUser.points - totalReward);
+    const newRank = getRank(currentUser.points);
+    if (oldRank.key !== newRank.key && newRank.key !== 'novice') {
+        fireConfetti();
+        playSound('finish');
+    }
+    result.textContent = t('result_success', { elapsed, reward: totalReward, streak: currentUser.streak, rank: t('rank_' + newRank.key) });
+    result.style.color = '#2ecc71';
+    playSound('finish');
+    showLootBox(currentUser);
+    document.getElementById('shareContainer').style.display = 'block';
+    document.getElementById('shareBtn').dataset.task = currentTask.name;
+    document.getElementById('shareBtn').dataset.time = elapsed;
+    document.getElementById('shareBtn').dataset.reward = totalReward;
+    document.getElementById('startBtn').style.display = 'none';
+    document.getElementById('finishBtn').style.display = 'none';
+    checkDailyBonus();
+    loadChallenge();
+    loadAchievements();
+    loadChart();
+});
+
+// ================================================================
+//  ДОСТИЖЕНИЯ
+// ================================================================
+function loadAchievements() {
+    if (!currentUser) return;
+    const list = document.getElementById('achievementsList');
+    list.innerHTML = '';
+    const progress = currentUser.achievements || {};
+    CONFIG.ACHIEVEMENTS.forEach(ach => {
+        const cur = progress[ach.id] || 0;
+        const done = cur >= ach.target;
+        const percent = Math.min(100, (cur / ach.target) * 100);
+        const div = document.createElement('div');
+        div.className = 'achievement-item';
+        div.innerHTML = `
+            <div><strong>${ach.icon} ${ach.name}</strong> <span style="color:${done ? '#2ecc71' : 'var(--text2)'};">${done ? '✅' : Math.round(percent) + '%'}</span></div>
+            <div style="font-size:12px;color:var(--text2);">${cur} / ${ach.target}</div>
+            <div class="ach-bar"><div class="ach-fill" style="width:${percent}%; background:${done ? '#2ecc71' : 'var(--primary)'};"></div></div>
+        `;
+        list.appendChild(div);
+    });
+}
+
+function updateAchievements() {
+    if (!currentUser) return;
+    const progress = currentUser.achievements || {};
+    let updated = false;
+    const inv = getUserInventory(currentUser);
+    const avatarCount = inv.filter(i => i.type === 'avatar').length;
+    const frameCount = inv.filter(i => i.type === 'frame').length;
+    const bannerCount = inv.filter(i => i.type === 'banner').length;
+    const titleCount = inv.filter(i => i.type === 'title').length;
+    const totalItems = inv.length;
+
+    CONFIG.ACHIEVEMENTS.forEach(ach => {
+        let val = 0;
+        switch(ach.type) {
+            case 'workout': val = currentUser.totalWorkouts || 0; break;
+            case 'boss': val = currentUser.bossFights || 0; break;
+            case 'points': val = currentUser.points || 0; break;
+            case 'streak': val = currentUser.streak || 0; break;
+            case 'collection':
+                if (ach.id === 'collector_5') val = totalItems;
+                else if (ach.id === 'collector_10') val = totalItems;
+                else if (ach.id === 'collector_20') val = totalItems;
+                break;
+            case 'avatars': val = avatarCount; break;
+            case 'frames': val = frameCount; break;
+            case 'banners': val = bannerCount; break;
+            case 'titles': val = titleCount; break;
+            case 'all_titles':
+                val = titleCount >= CONFIG.ITEMS.filter(i => i.type === 'title').length ? 1 : 0;
+                break;
+            default: return;
+        }
+        if (val > (progress[ach.id] || 0)) {
+            progress[ach.id] = Math.min(val, ach.target);
+            updated = true;
+        }
+    });
+
+    if (updated) {
+        currentUser.achievements = progress;
+        const users = getUsers();
+        users[currentUser.nickname] = currentUser;
+        saveUsers(users);
+        loadAchievements();
+    }
+}
+
+// ================================================================
+//  ПОЛЬЗОВАТЕЛЬСКИЕ УПРАЖНЕНИЯ
+// ================================================================
+function loadCustomExercises() {
+    if (!currentUser) return;
+    const list = document.getElementById('customExercisesList');
+    list.innerHTML = '';
+    (currentUser.customExercises || []).forEach((ex, i) => {
+        const div = document.createElement('div');
+        div.className = 'shop-item';
+        div.innerHTML = `<span><strong>${ex.name}</strong> (${ex.count} раз)</span>
+            <button class="btn btn-sm" style="background:#e74c3c;padding:2px 8px;" onclick="deleteCustomExercise(${i})"><i class="fas fa-trash"></i></button>`;
+        list.appendChild(div);
+    });
+}
+
+function deleteCustomExercise(index) {
+    if (!currentUser || !confirm('Удалить?')) return;
+    currentUser.customExercises.splice(index, 1);
+    const users = getUsers();
+    users[currentUser.nickname] = currentUser;
+    saveUsers(users);
+    loadCustomExercises();
+}
+
+document.getElementById('addCustomExBtn').addEventListener('click', function() {
+    const name = document.getElementById('customExName').value.trim();
+    const count = parseInt(document.getElementById('customExCount').value);
+    if (!name || !count) { showToast('Введите название и количество', 'error'); return; }
+    if (!currentUser) { showToast(t('alert_no_user'), 'error'); return; }
+    currentUser.customExercises = currentUser.customExercises || [];
+    currentUser.customExercises.push({ name, count, min: 30, max: 90 });
+    const users = getUsers();
+    users[currentUser.nickname] = currentUser;
+    saveUsers(users);
+    loadCustomExercises();
+    showToast('Добавлено', 'success');
+    updateAchievements();
+});
+
+// ================================================================
+//  ЧЕЛЛЕНДЖИ
+// ================================================================
+function getDailyChallenge() {
+    if (!currentUser) return null;
+    const today = new Date().toISOString().slice(0,10);
+    const key = 'challenge_' + currentUser.nickname;
+    let ch = JSON.parse(localStorage.getItem(key) || 'null');
+    if (!ch || ch.date !== today) {
+        const picked = CONFIG.CHALLENGES[Math.floor(Math.random() * CONFIG.CHALLENGES.length)];
+        ch = { date: today, task: picked.task, bonus: picked.bonus };
+        localStorage.setItem(key, JSON.stringify(ch));
+    }
+    return ch;
+}
+
+function loadChallenge() {
+    if (!currentUser) return;
+    const ch = getDailyChallenge();
+    if (!ch) return;
+    const display = document.getElementById('challengeDisplay');
+    display.textContent = '🔥 ' + t('challenge_today', { task: ch.task }) + (currentUser.dailyChallengeDone ? ' ✅' : '');
+}
+
+// ================================================================
+//  ГРАФИКИ
+// ================================================================
+function loadChart() {
+    if (!currentUser) return;
+    const historyKey = 'history_' + currentUser.nickname;
+    const history = JSON.parse(localStorage.getItem(historyKey) || '[]');
+    const emptyMsg = document.getElementById('chartEmptyMessage');
+    if (history.length === 0) {
+        emptyMsg.style.display = 'block';
+        if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
+        if (workoutChartInstance) { workoutChartInstance.destroy(); workoutChartInstance = null; }
+        return;
+    }
+    emptyMsg.style.display = 'none';
+    history.sort((a, b) => new Date(a.date) - new Date(b.date));
+    const dates = history.map(h => h.date);
+    const points = history.map(h => h.points);
+    const ctx1 = document.getElementById('progressChart').getContext('2d');
+    if (chartInstance) chartInstance.destroy();
+    chartInstance = new Chart(ctx1, {
+        type: 'line',
+        data: { labels: dates, datasets: [{ label: t('chart_title'), data: points, borderColor: '#6c5ce7', backgroundColor: 'rgba(108,92,231,0.2)', fill: true, tension: 0.2 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#a7a9be' } } }, scales: { x: { ticks: { color: '#a7a9be', maxTicksLimit: 6 } }, y: { ticks: { color: '#a7a9be' } } } }
+    });
+    const counts = {};
+    history.forEach(h => { counts[h.date] = (counts[h.date] || 0) + 1; });
+    const wDates = Object.keys(counts).sort();
+    const wCounts = wDates.map(d => counts[d]);
+    const ctx2 = document.getElementById('workoutChart').getContext('2d');
+    if (workoutChartInstance) workoutChartInstance.destroy();
+    workoutChartInstance = new Chart(ctx2, {
+        type: 'bar',
+        data: { labels: wDates, datasets: [{ label: 'Тренировок', data: wCounts, backgroundColor: '#6c5ce7' }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#a7a9be' } } }, scales: { x: { ticks: { color: '#a7a9be', maxTicksLimit: 6 } }, y: { ticks: { color: '#a7a9be' } } } }
+    });
+}
+
+// ================================================================
+//  ЕЖЕДНЕВНЫЙ БОНУС
+// ================================================================
+function checkDailyBonus() {
+    if (!currentUser) return;
+    const today = new Date().toISOString().slice(0,10);
+    if (currentUser.lastLoginDate === today) return;
+    const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
+    const yStr = yesterday.toISOString().slice(0,10);
+    if (currentUser.lastLoginDate === yStr) {
+        currentUser.streakDays = (currentUser.streakDays || 0) + 1;
+    } else {
+        currentUser.streakDays = 1;
+    }
+    if (currentUser.streakDays >= 7) {
+        const item = CONFIG.LOOT[Math.floor(Math.random() * CONFIG.LOOT.length)];
+        currentUser.inventory = currentUser.inventory || [];
+        currentUser.inventory.push(item);
+        currentUser.streakDays = 0;
+        showToast('🎁 Сундук за 7-дневную серию!', 'success');
+        playSound('loot');
+    }
+    currentUser.lastLoginDate = today;
+    const users = getUsers();
+    users[currentUser.nickname] = currentUser;
+    saveUsers(users);
+}
+
+// ================================================================
+//  РАНГИ
+// ================================================================
+function getRank(points) {
+    let result = CONFIG.RANKS[0];
+    for (let i = 0; i < CONFIG.RANKS.length; i++) {
+        if (points >= CONFIG.RANKS[i].min) result = CONFIG.RANKS[i];
+        else break;
+    }
+    return result;
+}
+
+function updateRankDisplay() {
+    if (!currentUser) return;
+    const rank = getRank(currentUser.points);
+    const idx = CONFIG.RANKS.indexOf(rank);
+    const next = CONFIG.RANKS[idx + 1];
+    document.getElementById('rankDisplay').textContent = '🏅 ' + (t('rank_' + rank.key) || rank.name);
+    const prev = CONFIG.RANKS[Math.max(0, idx - 1)];
+    const current = currentUser.points - (prev?.min || 0);
+    const needed = next ? next.min - (prev?.min || 0) : 1;
+    const percent = Math.min(100, (current / needed) * 100);
+    document.getElementById('rankProgress').style.width = percent + '%';
+    const pointsToNext = next ? next.min - currentUser.points : 0;
+    document.getElementById('rankNext').innerHTML = t('rank_progress', { points: pointsToNext });
+    document.getElementById('rankNextPoints').textContent = pointsToNext;
+}
+
+// ================================================================
+//  ЛИДЕРБОРД
+// ================================================================
+function loadLeaderboard() {
+    const list = document.getElementById('leaderList');
+    list.innerHTML = '';
+    const users = getUsers();
+    const sorted = Object.values(users).sort((a, b) => (b.points || 0) - (a.points || 0));
+    sorted.slice(0, 10).forEach((u, i) => {
+        const rank = getRank(u.points || 0);
+        const div = document.createElement('div');
+        div.className = 'leaderboard-item';
+        div.innerHTML = `
+            <span>#${i+1} <span class="leader-name" data-nick="${u.nickname}" style="cursor:pointer; color:var(--primary); text-decoration:underline;">${u.nickname}</span></span>
+            <span>💪 ${u.points || 0} ${t('points_short')} • ${t('rank_' + rank.key)}</span>
+        `;
+        list.appendChild(div);
+    });
+    if (!sorted.length) list.innerHTML = '<p style="color:var(--text2);">' + t('no_data') + '</p>';
+}
+
+// ================================================================
+//  АДМИН-ПАНЕЛЬ
+// ================================================================
+function toggleAdminPanel() {
+    const panel = document.getElementById('adminPanel');
+    if (!currentUser) {
+        panel.style.display = 'none';
+        return;
+    }
+    panel.style.display = 'block';
+    if (adminUnlocked) {
+        document.getElementById('adminContent').style.display = 'block';
+        document.getElementById('adminAuthRow').style.display = 'none';
+        renderActiveAdminTab();
+    } else {
+        document.getElementById('adminContent').style.display = 'none';
+        document.getElementById('adminAuthRow').style.display = 'flex';
+    }
+}
+
+document.getElementById('adminUnlockBtn').addEventListener('click', function() {
+    const pass = document.getElementById('adminMasterPassword').value;
+    if (pass === CONFIG.ADMIN_PASSWORD) {
+        adminUnlocked = true;
+        toggleAdminPanel();
+        showToast('Админ-панель разблокирована', 'success');
+    } else {
+        showToast('Неверный пароль', 'error');
+    }
+});
+
+document.querySelectorAll('.admin-tab-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.admin-tab-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        renderActiveAdminTab();
+    });
+});
+
+function renderActiveAdminTab() {
+    const activeBtn = document.querySelector('.admin-tab-btn.active');
+    if (!activeBtn) return;
+    const tab = activeBtn.dataset.admintab;
+    document.getElementById('adminStaff').style.display = 'none';
+    document.getElementById('adminShop').style.display = 'none';
+    document.getElementById('adminPromo').style.display = 'none';
+    document.getElementById('adminAnalytics').style.display = 'none';
+    if (tab === 'staff') {
+        document.getElementById('adminStaff').style.display = 'block';
+        renderAdminStaff();
+    } else if (tab === 'shop') {
+        document.getElementById('adminShop').style.display = 'block';
+        renderAdminShop();
+    } else if (tab === 'promo') {
+        document.getElementById('adminPromo').style.display = 'block';
+        renderAdminPromo();
+    } else if (tab === 'analytics') {
+        document.getElementById('adminAnalytics').style.display = 'block';
+        renderAdminAnalytics();
+    }
+}
+
+function renderAdminStaff() {
+    const container = document.getElementById('adminStaff');
+    const users = getUsers();
+    const sorted = Object.values(users).sort((a, b) => (b.points || 0) - (a.points || 0));
+    container.innerHTML = '<h5>Пользователи:</h5>';
+    sorted.forEach(u => {
+        const div = document.createElement('div');
+        div.style.cssText = 'display:flex; justify-content:space-between; align-items:center; padding:4px 0; border-bottom:1px solid var(--border); font-size:13px;';
+        div.innerHTML = `
+            <span><strong>${u.nickname}</strong> — ${u.points || 0} очков, тренировок: ${u.totalWorkouts || 0}, предметов: ${u.inventory ? u.inventory.length : 0}</span>
+            <div>
+                <button class="btn btn-sm" style="background:#3498db;padding:2px 8px;" onclick="grantItemToUser('${u.nickname}')"><i class="fas fa-gift"></i> Выдать предмет</button>
+            </div>
+        `;
+        container.appendChild(div);
+    });
+    if (!sorted.length) container.innerHTML += '<p>Нет пользователей</p>';
+}
+
+function grantItemToUser(nick) {
+    const users = getUsers();
+    const user = users[nick];
+    if (!user) return;
+    const itemId = prompt('Введите ID предмета для выдачи:');
+    if (!itemId) return;
+    const item = findItemById(itemId);
+    if (!item) { showToast('Предмет не найден', 'error'); return; }
+    if (isItemOwned(user, itemId)) { showToast('У пользователя уже есть этот предмет', 'error'); return; }
+    addItemToInventory(user, itemId);
+    saveUsers(users);
+    renderAdminStaff();
+    showToast(`Предмет ${item.name} выдан пользователю ${nick}`, 'success');
+}
+
+function renderAdminShop() {
+    const container = document.getElementById('adminShop');
+    container.innerHTML = '<h5>Управление предметами магазина:</h5>';
+    shopItems.forEach(item => {
+        const div = document.createElement('div');
+        div.style.cssText = 'display:flex; justify-content:space-between; align-items:center; padding:4px 0; border-bottom:1px solid var(--border); font-size:13px;';
+        div.innerHTML = `
+            <span>${item.icon} <strong>${item.name}</strong> (${t('type_' + item.type)}) — ${item.price} 🪙</span>
+            <div>
+                <button class="btn btn-sm" style="background:#f39c12;padding:2px 8px;" onclick="editAdminShopItemPrice('${item.id}')"><i class="fas fa-edit"></i></button>
+                <button class="btn btn-sm" style="background:#e74c3c;padding:2px 8px;" onclick="deleteAdminShopItem('${item.id}')"><i class="fas fa-trash"></i></button>
+            </div>
+        `;
+        container.appendChild(div);
+    });
+    const formDiv = document.createElement('div');
+    formDiv.style.cssText = 'margin-top:8px; display:flex; gap:4px; flex-wrap:wrap;';
+    formDiv.innerHTML = `
+        <input type="text" id="newItemName" placeholder="Название" style="flex:2; min-width:100px;">
+        <input type="text" id="newItemIcon" placeholder="Иконка (эмодзи)" style="flex:1; min-width:60px;">
+        <input type="number" id="newItemPrice" placeholder="Цена" style="flex:1; min-width:60px;">
+        <select id="newItemType">
+            <option value="avatar">Аватар</option>
+            <option value="frame">Рамка</option>
+            <option value="banner">Баннер</option>
+            <option value="title">Титул</option>
+        </select>
+        <button class="btn btn-sm" onclick="addAdminShopItem()"><i class="fas fa-plus"></i></button>
+    `;
+    container.appendChild(formDiv);
+}
+
+function addAdminShopItem() {
+    const name = document.getElementById('newItemName').value.trim();
+    const icon = document.getElementById('newItemIcon').value.trim();
+    const price = parseInt(document.getElementById('newItemPrice').value);
+    const type = document.getElementById('newItemType').value;
+    if (!name || !icon || !price || price <= 0) {
+        showToast('Заполните все поля корректно', 'error');
+        return;
+    }
+    const id = type + '_' + Date.now();
+    shopItems.push({ id, name, icon, price, type });
+    saveShopItems();
+    renderAdminShop();
+    showToast('Предмет добавлен', 'success');
+}
+
+function editAdminShopItemPrice(id) {
+    const item = findItemById(id);
+    if (!item) return;
+    const newPrice = prompt('Введите новую цену:', item.price);
+    if (newPrice === null) return;
+    const price = parseInt(newPrice);
+    if (isNaN(price) || price < 0) { showToast('Некорректная цена', 'error'); return; }
+    item.price = price;
+    saveShopItems();
+    renderAdminShop();
+    showToast('Цена обновлена', 'success');
+}
+
+function deleteAdminShopItem(id) {
+    if (!confirm('Удалить предмет?')) return;
+    shopItems = shopItems.filter(i => i.id !== id);
+    saveShopItems();
+    renderAdminShop();
+    showToast('Предмет удалён', 'success');
+}
+
+function renderAdminPromo() {
+    const container = document.getElementById('adminPromo');
+    const promos = JSON.parse(localStorage.getItem('promoCodes') || '[]');
+    container.innerHTML = '<h5>Промокоды:</h5>';
+    if (promos.length === 0) {
+        container.innerHTML += '<p>Нет промокодов</p>';
+    } else {
+        promos.forEach(p => {
+            const div = document.createElement('div');
+            div.style.cssText = 'display:flex; justify-content:space-between; align-items:center; padding:4px 0; border-bottom:1px solid var(--border); font-size:13px;';
+            div.innerHTML = `
+                <span><strong>${p.code}</strong> — бонус: ${p.bonus}, использовано: ${p.used}/${p.maxUses}</span>
+                <button class="btn btn-sm" style="background:#e74c3c;padding:2px 8px;" onclick="deleteAdminPromo('${p.code}')"><i class="fas fa-trash"></i></button>
+            `;
+            container.appendChild(div);
+        });
+    }
+    const formDiv = document.createElement('div');
+    formDiv.style.cssText = 'margin-top:8px; display:flex; gap:4px; flex-wrap:wrap;';
+    formDiv.innerHTML = `
+        <input type="text" id="newPromoCode" placeholder="Код" style="flex:1; min-width:70px;">
+        <input type="number" id="newPromoBonus" placeholder="Бонус" style="flex:1; min-width:60px;">
+        <input type="number" id="newPromoMaxUses" placeholder="Макс. исп." style="flex:1; min-width:60px;">
+        <button class="btn btn-sm" onclick="addAdminPromo()"><i class="fas fa-plus"></i></button>
+    `;
+    container.appendChild(formDiv);
+}
+
+function addAdminPromo() {
+    const code = document.getElementById('newPromoCode').value.trim().toUpperCase();
+    const bonus = parseInt(document.getElementById('newPromoBonus').value);
+    const maxUses = parseInt(document.getElementById('newPromoMaxUses').value);
+    if (!code || !bonus || !maxUses || bonus <= 0 || maxUses <= 0) {
+        showToast('Заполните все поля корректно', 'error');
+        return;
+    }
+    let promos = JSON.parse(localStorage.getItem('promoCodes') || '[]');
+    if (promos.some(p => p.code === code)) {
+        showToast('Такой код уже существует', 'error');
+        return;
+    }
+    promos.push({ code, bonus, maxUses, used: 0 });
+    localStorage.setItem('promoCodes', JSON.stringify(promos));
+    renderAdminPromo();
+    showToast('Промокод создан', 'success');
+}
+
+function deleteAdminPromo(code) {
+    if (!confirm('Удалить промокод?')) return;
+    let promos = JSON.parse(localStorage.getItem('promoCodes') || '[]');
+    promos = promos.filter(p => p.code !== code);
+    localStorage.setItem('promoCodes', JSON.stringify(promos));
+    renderAdminPromo();
+    showToast('Промокод удалён', 'success');
+}
+
+function renderAdminAnalytics() {
+    const container = document.getElementById('adminAnalytics');
+    const users = Object.values(getUsers());
+    const totalPoints = users.reduce((sum, u) => sum + (u.points || 0), 0);
+    const totalWorkouts = users.reduce((sum, u) => sum + (u.totalWorkouts || 0), 0);
+    const totalBossFights = users.reduce((sum, u) => sum + (u.bossFights || 0), 0);
+    container.innerHTML = `
+        <h5>Аналитика:</h5>
+        <div style="font-size:13px; line-height:1.6;">
+            <p>👥 Пользователей: <strong>${users.length}</strong></p>
+            <p>🪙 Всего очков: <strong>${totalPoints}</strong></p>
+            <p>🏋️ Всего тренировок: <strong>${totalWorkouts}</strong></p>
+            <p>⚔️ Всего боёв с боссами: <strong>${totalBossFights}</strong></p>
+        </div>
+    `;
+}
+
+// ================================================================
+//  ПЕРЕКЛЮЧЕНИЕ ОСНОВНЫХ ВКЛАДОК
+// ================================================================
+document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        const id = this.dataset.tab;
+        document.querySelectorAll('#trainTab,#shopTab,#inventoryTab,#leaderTab,#chartTab,#fightTab,#achievementsTab,#settingsTab').forEach(el => el.style.display = 'none');
+        document.getElementById(id).style.display = 'block';
+        if (id === 'chartTab') loadChart();
+        if (id === 'fightTab') { loadBoss(); updateRankDisplay(); }
+        if (id === 'achievementsTab') loadAchievements();
+        if (id === 'leaderTab') loadLeaderboard();
+        if (id === 'shopTab') loadShop();
+        if (id === 'inventoryTab') loadInventory();
+        if (id === 'settingsTab') toggleAdminPanel();
+    });
+});
+
+// ================================================================
+//  ПРОЧИЕ ОБРАБОТЧИКИ
+// ================================================================
+document.getElementById('shareBtn').addEventListener('click', function() {
+    const task = this.dataset.task || 'тренировку';
+    const time = this.dataset.time || '0 сек';
+    const pts = this.dataset.reward || '10';
+    const text = t('share_text', { task, time, points: pts }) + ' ' + window.location.href;
+    if (navigator.share) {
+        navigator.share({ title: 'Фитнес-игра', text }).catch(() => {});
+    } else {
+        navigator.clipboard.writeText(text).then(() => showToast('Ссылка скопирована', 'success'))
+            .catch(() => { const i = document.createElement('input'); i.value = text; document.body.appendChild(i); i.select(); document.execCommand('copy'); document.body.removeChild(i); showToast('Ссылка скопирована', 'success'); });
+    }
+});
+
+document.getElementById('calc1RMbtn').addEventListener('click', function() {
+    const w = parseInt(document.getElementById('weightInput').value);
+    const r = parseInt(document.getElementById('repsInput').value);
+    const res = document.getElementById('result1RM');
+    if (w > 0 && r > 0) {
+        const rm = Math.round(w * (1 + 0.0333 * r));
+        res.textContent = t('result_1rm', { rm });
+        res.style.color = 'var(--primary)';
+    } else {
+        res.textContent = t('result_1rm_error');
+        res.style.color = '#e74c3c';
+    }
+});
+
+document.getElementById('exportDataBtn').addEventListener('click', function() {
+    if (!currentUser) { showToast(t('alert_no_user'), 'error'); return; }
+    const data = { user: currentUser };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'fitness_data_' + currentUser.nickname + '.json';
+    a.click();
+    showToast('Экспортировано', 'success');
+});
+
+document.getElementById('importDataBtn').addEventListener('click', () => document.getElementById('importFileInput').click());
+
+document.getElementById('importFileInput').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+        try {
+            const data = JSON.parse(ev.target.result);
+            if (!currentUser) { showToast(t('alert_no_user'), 'error'); return; }
+            Object.assign(currentUser, data.user);
+            const users = getUsers();
+            users[currentUser.nickname] = currentUser;
+            saveUsers(users);
+            localStorage.setItem('currentUser', currentUser.nickname);
+            showToast('Импортировано', 'success');
+            location.reload();
+        } catch(err) {
+            showToast('Ошибка: ' + err.message, 'error');
+        }
+    };
+    reader.readAsText(file);
+    this.value = '';
+});
+
+document.getElementById('exportBtn').addEventListener('click', function() {
+    if (!currentUser) { showToast(t('alert_no_user'), 'error'); return; }
+    const historyKey = 'history_' + currentUser.nickname;
+    const history = JSON.parse(localStorage.getItem(historyKey) || '[]');
+    let csv = 'Date,Points,Level,Streak\n';
+    csv += new Date().toISOString().slice(0,10) + ',' + currentUser.points + ',' + (currentUser.fitnessLevel || '') + ',' + (currentUser.streak || 0) + '\n';
+    history.forEach(h => { csv += h.date + ',' + h.points + ',,\n'; });
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'fitness_data.csv';
+    a.click();
+    showToast('CSV экспортирован', 'success');
+});
+
+document.getElementById('resetProgressBtn').addEventListener('click', function() {
+    if (!currentUser) { showToast(t('alert_no_user'), 'error'); return; }
+    const input = prompt(t('alert_reset_confirm'));
+    if (input && input.trim().toUpperCase() === 'СБРОС') {
+        currentUser.points = 0;
+        currentUser.dailyDone = false;
+        currentUser.streak = 0;
+        currentUser.inventory = [];
+        currentUser.totalWorkouts = 0;
+        currentUser.usedPromoCodes = [];
+        currentUser.dailyChallengeDone = false;
+        currentUser.bossFights = 0;
+        currentUser.streakDays = 0;
+        currentUser.customExercises = [];
+        currentUser.achievements = {};
+        const historyKey = 'history_' + currentUser.nickname;
+        localStorage.removeItem(historyKey);
+        const users = getUsers();
+        users[currentUser.nickname] = currentUser;
+        saveUsers(users);
+        localStorage.setItem('currentUser', currentUser.nickname);
+        showToast(t('alert_reset_done'), 'success');
+        location.reload();
+    } else {
+        showToast('Сброс отменён', 'info');
+    }
+});
+
+document.getElementById('goalSelect').addEventListener('change', function() {
+    if (!currentUser) return;
+    currentUser.goal = this.value;
+    const users = getUsers();
+    users[currentUser.nickname] = currentUser;
+    saveUsers(users);
+    showToast('Цель изменена', 'success');
+});
+
+document.getElementById('darkTheme').addEventListener('change', function() {
+    document.body.classList.toggle('light', !this.checked);
+    localStorage.setItem('darkTheme', this.checked);
+});
+
+document.getElementById('langSelect').addEventListener('change', function() {
+    setLanguage(this.value);
+});
+
+document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        setLanguage(this.dataset.lang);
+    });
+});
+
+document.querySelectorAll('#regPathSelector .path-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('#regPathSelector .path-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+    });
+});
+document.querySelectorAll('#regGoalSelector .goal-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('#regGoalSelector .goal-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+    });
+});
+
+// ================================================================
+//  ПРОФИЛЬ
+// ================================================================
+function getFrameColor(frameId) {
+    const colorMap = {
+        'frame_red': '#e74c3c', 'frame_green': '#2ecc71', 'frame_blue': '#3498db',
+        'frame_yellow': '#f1c40f', 'frame_purple': '#9b59b6', 'frame_pink': '#e84393',
+        'frame_gold': '#f39c12', 'frame_silver': '#bdc3c7',
+        'frame_rainbow': 'linear-gradient(45deg, red, orange, yellow, green, blue, indigo, violet)',
+        'frame_neon': '#00ffcc', 'frame_diamond': '#00d2ff', 'frame_glow': '#ffd700'
+    };
+    return colorMap[frameId] || '#6c5ce7';
+}
+
+function getBannerStyle(bannerId) {
+    const bannerStyles = {
+        'banner_red': 'linear-gradient(135deg, #e74c3c, #c0392b)',
+        'banner_blue': 'linear-gradient(135deg, #3498db, #2980b9)',
+        'banner_green': 'linear-gradient(135deg, #2ecc71, #27ae60)',
+        'banner_yellow': 'linear-gradient(135deg, #f1c40f, #f39c12)',
+        'banner_purple': 'linear-gradient(135deg, #9b59b6, #8e44ad)',
+        'banner_pink': 'linear-gradient(135deg, #e84393, #d63384)',
+        'banner_sunset': 'linear-gradient(135deg, #ff6b6b, #feca57)',
+        'banner_space': 'linear-gradient(135deg, #0f0c29, #302b63, #24243e)',
+        'banner_ocean': 'linear-gradient(135deg, #2980b9, #6dd5fa)',
+        'banner_fire': 'linear-gradient(135deg, #e74c3c, #f39c12)',
+        'banner_rainbow': 'linear-gradient(45deg, red, orange, yellow, green, blue, indigo, violet)',
+        'banner_gold': 'linear-gradient(135deg, #f1c40f, #d4af37)',
+        'banner_neon': 'linear-gradient(135deg, #00ffcc, #ff00cc)'
+    };
+    return bannerStyles[bannerId] || 'linear-gradient(135deg, #6c5ce7, #a29bfe)';
+}
+
+function openProfile(user, isSelf = false) {
+    if (!user) return;
+    const modal = document.getElementById('profileModal');
+    document.getElementById('profileBanner').style.background = getBannerStyle(user.banner);
+    const avatarEl = document.getElementById('profileAvatar');
+    if (user.avatar) {
+        const item = findItemById(user.avatar);
+        avatarEl.textContent = item ? item.icon : user.nickname.charAt(0).toUpperCase();
+    } else {
+        avatarEl.textContent = user.nickname.charAt(0).toUpperCase();
+    }
+    const frameColor = getFrameColor(user.frame);
+    avatarEl.style.border = `4px solid ${frameColor}`;
+    document.getElementById('profileNickname').textContent = user.nickname;
+    const titleItem = user.title ? findItemById(user.title) : null;
+    document.getElementById('profileTitle').textContent = titleItem ? titleItem.name : '';
+    
+    const stats = document.getElementById('profileStats');
+    stats.innerHTML = `
+        <div class="stat-item"><div class="stat-value">${user.points || 0}</div>🪙 ${t('profile_stats_points')}</div>
+        <div class="stat-item"><div class="stat-value">${t('rank_' + getRank(user.points).key)}</div>🏅 ${t('profile_stats_rank')}</div>
+        <div class="stat-item"><div class="stat-value">${user.totalWorkouts || 0}</div>🏋️ ${t('profile_stats_workouts')}</div>
+        <div class="stat-item"><div class="stat-value">${user.streak || 0}</div>🔥 ${t('profile_stats_streak')}</div>
+        <div class="stat-item"><div class="stat-value">${user.age || '-'}</div>👤 ${t('profile_stats_age')}</div>
+        <div class="stat-item"><div class="stat-value">${user.weight || '-'} кг</div>⚖️ ${t('profile_stats_weight')}</div>
+        <div class="stat-item"><div class="stat-value">${user.gender === 'male' ? 'М' : 'Ж'}</div>🧑 ${t('profile_stats_gender')}</div>
+        <div class="stat-item"><div class="stat-value">${user.path || '-'}</div>🛤️ ${t('profile_stats_path')}</div>
+        <div class="stat-item"><div class="stat-value">${user.goal === 'lose' ? 'Похудеть' : user.goal === 'bulk' ? 'Накачаться' : 'Сила'}</div>🎯 ${t('profile_stats_goal')}</div>
+        <div class="stat-item"><div class="stat-value">${user.fitnessLevel || '-'}</div>📊 ${t('profile_stats_level')}</div>
+        <div class="stat-item"><div class="stat-value">${user.bossFights || 0}</div>⚔️ ${t('profile_stats_boss')}</div>
+        <div class="stat-item"><div class="stat-value">${user.inventory ? user.inventory.length : 0}</div>📦 ${t('profile_stats_inventory')}</div>
+    `;
+    
+    const actions = document.getElementById('profileActions');
+    if (isSelf) {
+        actions.innerHTML = `<button class="btn btn-sm" onclick="openAvatarPicker()"><i class="fas fa-user-circle"></i> ${t('change_avatar_btn')}</button>`;
+    } else {
+        actions.innerHTML = '';
+    }
+    modal.style.display = 'flex';
+}
+
+function closeProfileModal() {
+    document.getElementById('profileModal').style.display = 'none';
+}
+
+function openAvatarPicker() {
+    const modal = document.getElementById('avatarPickerModal');
+    const list = document.getElementById('avatarPickerList');
+    list.innerHTML = '';
+    const avatars = currentUser.inventory.filter(i => i.type === 'avatar');
+    if (avatars.length === 0) {
+        list.innerHTML = '<p style="color:var(--text2);">Нет купленных аватарок</p>';
+    } else {
+        avatars.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'avatar-picker-item';
+            div.textContent = item.icon;
+            div.onclick = () => {
+                setActiveItem(currentUser, 'avatar', item.id);
+                const users = getUsers();
+                users[currentUser.nickname] = currentUser;
+                saveUsers(users);
+                updateHeaderAvatar();
+                updateUI();
+                closeAvatarPicker();
+                openProfile(currentUser, true);
+                showToast('Аватар обновлён', 'success');
+            };
+            list.appendChild(div);
+        });
+    }
+    modal.style.display = 'flex';
+}
+
+function closeAvatarPicker() {
+    document.getElementById('avatarPickerModal').style.display = 'none';
+}
+
+function updateHeaderAvatar() {
+    if (!currentUser) return;
+    const avatarEl = document.getElementById('avatarDisplay');
+    if (currentUser.avatar) {
+        const item = findItemById(currentUser.avatar);
+        if (item && item.type === 'avatar') {
+            avatarEl.textContent = item.icon;
+        } else {
+            avatarEl.textContent = currentUser.nickname.charAt(0).toUpperCase();
+        }
+    } else {
+        avatarEl.textContent = currentUser.nickname.charAt(0).toUpperCase();
+    }
+    const frameItem = findItemById(currentUser.frame);
+    if (frameItem) {
+        avatarEl.style.border = '2px solid ' + getFrameColor(frameItem.id);
+    } else {
+        avatarEl.style.border = 'none';
+    }
+}
+
+// ================================================================
+//  ИНИЦИАЛИЗАЦИЯ
+// ================================================================
+document.addEventListener('DOMContentLoaded', function() {
+    const dark = localStorage.getItem('darkTheme') !== 'false';
+    document.body.classList.toggle('light', !dark);
+    document.getElementById('darkTheme').checked = dark;
+    const lang = localStorage.getItem('lang') || 'ru';
+    document.getElementById('langSelect').value = lang;
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
+    setLanguage(lang);
+    loadShopItems();
+
+    const saved = localStorage.getItem('currentUser');
+    if (saved) {
+        const users = getUsers();
+        if (users[saved]) {
+            currentUser = users[saved];
+            showMainScreen();
+            return;
+        }
+    }
+    showLoginScreen();
+});
+
+console.log('🏋️ Фитнес-игра загружена (app.js)');
